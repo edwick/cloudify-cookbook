@@ -1,0 +1,16 @@
+webserver_port: 8081
+agent_user: centos
+image: CentOS-7-x86_64-GenericCloud-1608
+flavor: m1.small
+network_name: (network name)
+floating_network_id: (network that will allocate your floating IPs)
+key_pair_name: (key pair name)
+private_key_path: (private key on your cloudify manager)
+security_group_name: (security group name, pulled from your openstack GUI or command-line client)
+
+# These settings are most easily obtained by pulling down the openstack openrc.sh script from the Security dashboard.
+keystone_username: (keystone username)
+keystone_password: (keystone password)
+keystone_tenant_name: (your openstack tenant name)
+keystone_url: (openstack URL)
+region: (region)
