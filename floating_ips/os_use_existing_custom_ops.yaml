@@ -89,6 +89,15 @@ node_types:
             log_message:
               type: string
               description: Log message to be written; toy example appends to a file hardcoded in the script.
+              # NOTE: Cloudify expects this operation to define a value either here as a default, or in any
+              # instantiating node_templates (where it may be pulled from anything known at that point of
+              # the lifecycle). You can send in a custom value without implementing a custom workflow by
+              # using the "execute_operations" workflow and passing in the "allow_kwargs_override" flag to
+              # "true" and the "operation_kwargs" map to whatever your actual arguments are. For this specific
+              # blueprint, an operation parameters YAML file could include:
+              # allow_kwargs_override: true
+              # operation_kwargs:
+              #   log_message: 'Your log message here'
               default: ''
 
 node_templates:
