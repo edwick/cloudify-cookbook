@@ -1,3 +1,7 @@
 server_ip: (INSERT YOUR SERVER IP HERE)
 
+# Fabric plugin must define user and key path.
+fabric_user: (INSERT YOUR FABRIC USER HERE)
+fabric_key_path: (INSERT YOUR FABRIC USER'S PRIVATE KEY PATH HERE, must be found on Cloudify Manager)
+
 # Add any new inputs below this line

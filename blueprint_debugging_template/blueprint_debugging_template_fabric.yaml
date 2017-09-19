@@ -18,6 +18,74 @@ description: >
    cloud provider.
    6. Test until you are satisfied with your new node, and then add it to your original blueprint (along with any new
    inputs or imports) and re-test to ensure you don't get weird cross-talk between nodes.
+   This blueprint assumes you are using the Fabric plugin, and WILL NOT make use of an agent on the remote VM. If you
+   are using an agent on the VM (which is the norm), you should use blueprint_debugging_template.yaml instead.
 
 imports:
+  # REQUIRED IMPORTS: Feel free to change versions or URLs to match your environment, but you must import
+  # these for any fabric-based blueprint to work.
   - http://www.getcloudify.org/spec/cloudify/3.4.2/types.yaml
+  - http://www.getcloudify.org/spec/fabric-plugin/1.5.1/plugin.yaml
+
+  # NEW IMPORTS START: Add any new imports between the START and END comments. This will make it easier to see
+  # exactly what you need to add to your final blueprint.
+
+  # NEW IMPORTS END
+
+inputs:
+  # REQUIRED INPUTS: The minimum information you need is the IP address of the server you wish to test
+  # and fabric connection information (fabric user and key path on the Cloudify manager)
+  server_ip:
+    description: The ip of the VM that you are testing on.
+    type: string
+
+  fabric_user:
+    description: User ID that will own the Fabric process run on the remote VM
+    type: string
+
+  fabric_key_path:
+    description: Private key fabric_user should use to ssh into the remote VM (must be present on Cloudify manager)
+    type: string
+
+  # NEW INPUTS START: Add any new inputs your node will need between these START and END comments.
+
+  # NEW INPUTS END
+
+
+dsl_definitions:
+
+  # Handy DSL definition that you can use to pass in fabric_env to your new node. If you are using Fabric
+  # in your blueprint, you almost certainly have a comparable definition in your blueprint; feel free to replace
+  # the input names and dsl_definition from your blueprint, or copy these names/dsl_definitions into yours to
+  # remove code duplication.
+  fabric_env_configuration: &fabric_env_configuration
+    user: { get_input: fabric_user }
+    key_filename: { get_input: fabric_key_path }
+
+node_templates:
+
+  base_vm:
+    # This is the deployed VM which you will be using to test with.
+    type: cloudify.nodes.Compute
+    properties:
+      ip: { get_input: server_ip }
+      agent_config:
+        install_method: none
+
+  # NEW NODE_TEMPLATES START: Insert any new nodes that you need between these START and END comments.
+  # If you find you are adding many nodes to the same testing blueprint, you are probably testing too much at once.
+  # Nodes should follow basic single-responsibility principles of object-oriented design: do one
+  # thing, do it well, and do it only.
+
+  # NEW NODE_TEMPLATES END
+
+outputs:
+
+  server_ip:
+    # Somewhat redundant echo of the server IP input, just to put a placeholder in the outputs section.
+    description: VM IP address
+    value: { get_property: [ base_vm, ip ] }
+
+    # NEW OUTPUTS START: Add any new outputs your deployment should create between these START and END comments
+
+    # NEW OUTPUTS END

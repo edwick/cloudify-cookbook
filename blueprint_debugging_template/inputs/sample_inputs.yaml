@@ -1,0 +1,7 @@
+server_ip: (INSERT YOUR SERVER IP HERE)
+
+# We do not assume that an agent is installed on your remote VM, and will install one when we connect.
+agent_user: (your agent user here)
+agent_key_path: (path to ssh key for agent user to make RPC calls on your remote VM, found on Cloudify Manager)
+
+# Add any new inputs below this line

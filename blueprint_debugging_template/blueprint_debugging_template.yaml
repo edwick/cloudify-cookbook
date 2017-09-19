@@ -1,0 +1,82 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+   This is a template for blueprint debugging. Nodes in a template should be designed to be as modular and self-
+   contained as possible, and this blueprint will exploit that fact to allow you to test a node quickly. To use this
+   blueprint template:
+   1. Deploy a VM on your cloud environment. You can do this directly (via the OpenStack/AWS/whatever dashboard) or by
+   deploying a known functioning blueprint that you wish to enhance.
+   2. Copy this entire blueprint template to a new directory.
+   3. Fix the inputs template to use your inputs (specifying things like ssh keys, users for agents or Fabric ssh
+   calls). The most important thing you will need is the IP of the VM you deployed in step #1, which you connect to in
+   the "base_vm" node_template below.
+   4. Implement your new node in your debugging blueprint. This blueprint will deploy that node and ONLY that node, and
+   thus can be deployed much faster than your entire blueprint.
+   5. You will almost certainly need a way to revert your VM back to its original state to retest as you find bugs.
+   You can do this via a manually-written shell script (which can itself be invoked as a blueprint step if you feel
+   like being really meta) or by saving an image of your deployed VM as a snapshot and then re-deploying the VM from your
+   cloud provider.
+   6. Test until you are satisfied with your new node, and then add it to your original blueprint (along with any new
+   inputs or imports) and re-test to ensure you don't get weird cross-talk between nodes.
+   This blueprint assumes you are making use of the script plugin or a plugin of your own devising. If you are using
+   the Fabric plugin, the blueprint_debugging_template_fabric.yaml blueprint is the one you want.
+
+imports:
+  # REQUIRED IMPORTS: Feel free to change version or URL to match your environment, but you must import
+  # this for any blueprint to work.
+  - http://www.getcloudify.org/spec/cloudify/3.4.2/types.yaml
+
+  # NEW IMPORTS START: Add any new imports between the START and END comments. This will make it easier to see
+  # exactly what you need to add to your final blueprint.
+
+  # NEW IMPORTS END
+
+inputs:
+  # REQUIRED INPUTS: The minimum information you need is the IP address of the server you wish to test
+  # and fabric connection information (fabric user and key path on the Cloudify manager)
+  server_ip:
+    description: The ip of the VM that you are testing on.
+    type: string
+
+  agent_user:
+    description: User ID that will own the Fabric process run on the remote VM
+    type: string
+
+  agent_key_path:
+    description: Private key fabric_user should use to ssh into the remote VM (must be present on Cloudify manager)
+    type: string
+
+  # NEW INPUTS START: Add any new inputs your node will need between these START and END comments.
+
+  # NEW INPUTS END
+
+
+node_templates:
+
+  base_vm:
+    # This is the deployed VM which you will be using to test with.
+    # Note that the agent_config section will install an agent on the remote VM; we do not assume one is there already.
+    type: cloudify.nodes.Compute
+    properties:
+      ip: { get_input: server_ip }
+      agent_config:
+        user: { get_input: agent_user }
+        key: { get_input: agent_key_path }
+
+    # NEW NODE_TEMPLATES START: Insert any new nodes that you need between these START and END comments.
+    # If you find you are adding many nodes to the same testing blueprint, you are probably testing too much at once.
+    # Nodes should follow basic single-responsibility principles of object-oriented design: do one
+    # thing, do it well, and do it only.
+
+    # NEW NODE_TEMPLATES END
+
+outputs:
+
+  server_ip:
+    # Somewhat redundant echo of the server IP input, just to put a placeholder in the outputs section.
+    description: VM IP address
+    value: { get_property: [ base_vm, ip ] }
+
+    # NEW OUTPUTS START: Add any new outputs your deployment should create between these START and END comments
+
+    # NEW OUTPUTS END
